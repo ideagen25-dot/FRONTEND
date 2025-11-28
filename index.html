@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Portal | The Idea Gen Technologies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f8fafc; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .progress-circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // ==========================================
+        // 🚀 PASTE YOUR RENDER BACKEND URL HERE
+        // Example: "https://idea-gen-api.onrender.com/api"
+        // ==========================================
+        const API_BASE_URL = "http://127.0.0.1:5000/api"; 
+
+        const Shield = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
+        const Users = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+        const Calendar = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+        const Upload = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>;
+        const Trash2 = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>;
+        const Search = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
+        const LogOut = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
+        const Star = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+        const CheckCircle = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
+        const XCircle = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>;
+        const BarChart = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>;
+        const UserPlus = (p) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>;
+
+        const api = {
+            get: async (url) => { try { const res = await fetch(`${API_BASE_URL}${url}`); return res.json(); } catch(e){return null} },
+            post: async (url, data) => { const res = await fetch(`${API_BASE_URL}${url}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) }); return res.json(); },
+            postFile: async (url, formData) => { const res = await fetch(`${API_BASE_URL}${url}`, { method: 'POST', body: formData }); return res.json(); },
+            delete: async (url) => { const res = await fetch(`${API_BASE_URL}${url}`, { method: 'DELETE' }); return res.json(); }
+        };
+
+        const HomePage = ({ onNavigate }) => (
+            <div className="min-h-screen bg-gradient-to-br from-indigo-900 to-slate-900 flex flex-col items-center justify-center text-white px-4">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6">Internship <span className="text-indigo-400">Portal</span></h1>
+                    <p className="text-indigo-200 text-lg">Centralized management for campus training</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-6">
+                    <button onClick={() => onNavigate('staff_login')} className="flex items-center gap-3 bg-white text-indigo-900 px-8 py-5 rounded-xl font-bold hover:bg-indigo-50 transition shadow-lg text-lg"><Shield /> Staff Login</button>
+                    <button onClick={() => onNavigate('student')} className="flex items-center gap-3 bg-indigo-600 text-white px-8 py-5 rounded-xl font-bold hover:bg-indigo-500 transition shadow-lg border border-indigo-500 text-lg"><Users /> Student Portal</button>
+                </div>
+            </div>
+        );
+
+        const StaffLogin = ({ onLoginSuccess, onBack }) => {
+            const [loading, setLoading] = useState(false);
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                const res = await api.post('/system/login', {username: e.target.username.value, password: e.target.password.value});
+                setLoading(false);
+                if(res.success) { onLoginSuccess(res.user); } else { alert("Invalid Credentials"); }
+            };
+            return (
+                <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative">
+                     <button onClick={onBack} className="absolute top-6 left-6 text-slate-500 flex gap-2 font-bold hover:text-indigo-600 transition"><LogOut size={20}/> Back</button>
+                     <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md fade-in">
+                        <div className="text-center mb-6"><h2 className="text-2xl font-bold text-slate-800">Staff Login</h2><p className="text-slate-500">Secure Access for Admin & Trainers</p></div>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <input name="username" placeholder="Username" required className="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white transition"/>
+                            <input type="password" name="password" placeholder="Password" required className="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white transition"/>
+                            <button disabled={loading} className="w-full bg-slate-800 text-white p-4 rounded-xl font-bold hover:bg-slate-700 transition transform active:scale-95 disabled:opacity-50">
+                                {loading ? "Verifying..." : "Login"}
+                            </button>
+                        </form>
+                     </div>
+                </div>
+            )
+        }
+
+        const AdminDashboard = ({ user, onBack }) => {
+            const [activeTab, setActiveTab] = useState(user.role === 'trainer' ? 'attendance' : 'students');
+            const [students, setStudents] = useState([]);
+            const [feedbacks, setFeedbacks] = useState([]);
+            const [stats, setStats] = useState({total_students: 0, present_today: 0, attendance_pct: 0, avg_feedback: 0});
+            
+            useEffect(() => { loadData(); if(user.role === 'admin') fetchStats(); }, [activeTab]);
+
+            const fetchStats = async () => {
+                const res = await api.get('/stats/dashboard');
+                if(res) setStats(res);
+            }
+
+            const loadData = async () => {
+                const s = await api.get('/students');
+                if(s) setStudents(s);
+                if(user.role === 'admin' && activeTab === 'feedback') {
+                    const f = await api.get('/feedback');
+                    if(f) setFeedbacks(f);
+                }
+            };
+
+            const handleAddStudent = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                const res = await api.post('/students', data);
+                if(res.success) { loadData(); e.target.reset(); alert("Student Added"); } else { alert(res.message); }
+            };
+
+            const handleFileUpload = async (e) => {
+                e.preventDefault();
+                if(!e.target.file.files[0]) return;
+                const formData = new FormData();
+                formData.append('file', e.target.file.files[0]);
+                const res = await api.postFile('/students/upload', formData);
+                alert(res.message);
+                loadData();
+            };
+
+            const handleDelete = async (id) => {
+                if(confirm("Delete student?")) await api.delete(`/students/${id}`);
+                loadData();
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50">
+                    <nav className="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2"><Shield className="text-indigo-600"/> {user.role === 'admin' ? 'Admin Console' : 'Trainer Portal'}</h2>
+                        <div className="flex items-center gap-4"><span className="text-sm bg-indigo-50 px-3 py-1 rounded-full text-indigo-700 border border-indigo-100 font-medium">👤 {user.username}</span><button onClick={onBack} className="text-sm text-red-500 hover:text-red-700 flex items-center gap-1"><LogOut size={16}/> Logout</button></div>
+                    </nav>
+                    
+                    <div className="max-w-7xl mx-auto p-6 fade-in">
+                        {user.role === 'admin' && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                    <div className="flex justify-between"><p className="text-slate-500 text-sm font-medium">Total Students</p><Users className="text-indigo-500" size={20}/></div>
+                                    <p className="text-3xl font-bold mt-2 text-slate-800">{stats.total_students}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                    <div className="flex justify-between"><p className="text-slate-500 text-sm font-medium">Present Today</p><CheckCircle className="text-green-500" size={20}/></div>
+                                    <p className="text-3xl font-bold mt-2 text-slate-800">{stats.present_today}</p>
+                                </div>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                    <div className="flex justify-between"><p className="text-slate-500 text-sm font-medium">Attendance %</p><BarChart className="text-blue-500" size={20}/></div>
+                                    <p className="text-3xl font-bold mt-2 text-blue-600">{stats.attendance_pct}%</p>
+                                </div>
+                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 rounded-xl shadow-lg text-white">
+                                    <div className="flex justify-between"><p className="text-indigo-100 text-sm font-medium">Avg Feedback</p><Star className="text-yellow-400 fill-yellow-400" size={20}/></div>
+                                    <p className="text-3xl font-bold mt-2">{stats.avg_feedback}<span className="text-lg opacity-60">/5</span></p>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="flex gap-4 mb-6 overflow-x-auto pb-2">
+                            {user.role === 'admin' && (
+                                <>
+                                    <button onClick={() => setActiveTab('students')} className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition ${activeTab === 'students' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border hover:bg-slate-50'}`}>Students</button>
+                                    <button onClick={() => setActiveTab('upload')} className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition ${activeTab === 'upload' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border hover:bg-slate-50'}`}>Add / Upload</button>
+                                    <button onClick={() => setActiveTab('feedback')} className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition ${activeTab === 'feedback' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border hover:bg-slate-50'}`}>Feedbacks</button>
+                                </>
+                            )}
+                            <button onClick={() => setActiveTab('attendance')} className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition ${activeTab === 'attendance' ? 'bg-indigo-600 text-white shadow-md' : 'bg-white text-slate-600 border hover:bg-slate-50'}`}>Mark Attendance</button>
+                        </div>
+
+                        {activeTab === 'students' && (
+                            <div className="bg-white rounded-xl shadow-sm border overflow-hidden fade-in">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-slate-50 border-b">
+                                            <tr><th className="p-4 text-slate-600 font-semibold">Name</th><th className="p-4 text-slate-600 font-semibold">Roll No</th><th className="p-4 text-slate-600 font-semibold">ID</th><th className="p-4 text-slate-600 font-semibold">Password</th><th className="p-4 text-slate-600 font-semibold">Action</th></tr>
+                                        </thead>
+                                        <tbody className="divide-y">
+                                            {students.map(s => (
+                                                <tr key={s.id} className="hover:bg-slate-50 transition">
+                                                    <td className="p-4 font-medium">{s.name}</td><td className="p-4">{s.roll_number}</td><td className="p-4 text-slate-500">{s.student_id}</td><td className="p-4 font-mono text-xs text-slate-400">{s.password}</td>
+                                                    <td className="p-4"><button onClick={() => handleDelete(s.id)} className="text-red-500 hover:bg-red-50 p-2 rounded transition"><Trash2 size={16}/></button></td>
+                                                </tr>
+                                            ))}
+                                            {students.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-slate-400">No students found. Add some!</td></tr>}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'upload' && (
+                            <div className="grid md:grid-cols-2 gap-8 fade-in">
+                                <div className="bg-white p-8 rounded-xl shadow-lg border">
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><UserPlus size={20}/> Add Single Student</h3>
+                                    <form onSubmit={handleAddStudent} className="space-y-4">
+                                        <input name="name" placeholder="Full Name" required className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"/>
+                                        <input name="roll_number" placeholder="Roll Number (e.g. CS101)" required className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"/>
+                                        <input name="password" placeholder="Set Password" required className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"/>
+                                        <input name="department" placeholder="Department" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"/>
+                                        <button className="w-full bg-indigo-600 text-white p-3 rounded-lg font-bold hover:bg-indigo-700 transition">Add Student</button>
+                                    </form>
+                                </div>
+                                <div className="bg-white p-8 rounded-xl shadow-lg border">
+                                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Upload size={20}/> Bulk Student Upload</h3>
+                                    <p className="text-sm text-slate-500 mb-6 border-l-4 border-indigo-500 pl-4 bg-indigo-50 p-2 rounded-r">CSV Headers Required:<br/><code className="font-mono text-indigo-700">Name, RollNumber, Password, Department</code></p>
+                                    <form onSubmit={handleFileUpload} className="space-y-4">
+                                        <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-indigo-500 hover:bg-indigo-50 transition cursor-pointer relative group">
+                                            <input type="file" name="file" accept=".csv" required className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/>
+                                            <Upload className="mx-auto text-slate-400 group-hover:text-indigo-500 mb-2"/><p className="text-slate-600 font-medium group-hover:text-indigo-700">Click to select CSV</p>
+                                        </div>
+                                        <button className="w-full bg-slate-800 text-white p-3 rounded-lg font-bold hover:bg-slate-700 transition">Upload & Import</button>
+                                    </form>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'attendance' && <AttendanceMarker students={students} onSave={fetchStats} />}
+                        
+                        {activeTab === 'feedback' && (
+                             <div className="grid gap-4 fade-in">
+                                {feedbacks.map(f => (
+                                    <div key={f.id} className="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md transition">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div><h4 className="font-bold text-lg text-slate-800">{f.roll_number}</h4><p className="text-sm text-slate-500">{f.date}</p></div>
+                                            <div className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1"><Star size={14}/> {f.overall_rating}/5</div>
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2 text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg">
+                                            <span>Content: {f.session_content}/5</span><span>Applicability: {f.practical_applicability}/5</span><span>Interaction: {f.trainer_interaction}/5</span>
+                                        </div>
+                                        {f.feedback_text && <div className="bg-slate-50 p-3 rounded-lg border-l-4 border-indigo-400"><p className="text-slate-700 italic">"{f.feedback_text}"</p></div>}
+                                    </div>
+                                ))}
+                                {feedbacks.length === 0 && <p className="text-center text-slate-500 mt-10">No feedback submitted yet.</p>}
+                             </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const AttendanceMarker = ({students, onSave}) => {
+            const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+            const [statusMap, setStatusMap] = useState({});
+
+            const handleSave = async () => {
+                const payload = Object.entries(statusMap).map(([roll, status]) => ({ roll_number: roll, date: date, status: status }));
+                if(payload.length === 0) return alert("Mark attendance first");
+                await api.post('/attendance', payload);
+                alert("Attendance Saved!");
+                if(onSave) onSave();
+            };
+
+            const toggleStatus = (roll, val) => { setStatusMap(prev => ({...prev, [roll]: val})); };
+
+            return (
+                <div className="bg-white p-6 rounded-xl border shadow-sm fade-in">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-lg font-bold flex items-center gap-2"><Calendar /> Mark Attendance</h3>
+                        <div className="flex gap-4">
+                            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="border p-2 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500" />
+                            <button onClick={handleSave} className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-200">Save All</button>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {students.map(s => (
+                            <div key={s.id} className="border p-4 rounded-lg flex justify-between items-center hover:shadow-md transition bg-white group">
+                                <div><p className="font-bold text-slate-800">{s.name}</p><p className="text-xs text-slate-500">{s.roll_number}</p></div>
+                                <div className="flex gap-1">
+                                    {['present', 'absent'].map(st => (
+                                        <button key={st} onClick={() => toggleStatus(s.roll_number, st)}
+                                            className={`px-3 py-1 rounded-md capitalize text-xs font-bold transition ${statusMap[s.roll_number] === st ? (st === 'present' ? 'bg-green-100 text-green-700 ring-2 ring-green-500' : 'bg-red-100 text-red-700 ring-2 ring-red-500') : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>{st}</button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )
+        }
+
+        const StudentPortal = ({ onBack }) => {
+            const [view, setView] = useState('login'); 
+            const [user, setUser] = useState(null);
+            const [checkRoll, setCheckRoll] = useState('');
+            const [checkData, setCheckData] = useState(null);
+
+            const handleLogin = async (e) => {
+                e.preventDefault();
+                const res = await api.post('/student/login', {student_id: e.target.student_id.value, password: e.target.password.value});
+                if(res.success) { setUser(res.student); setView('dashboard'); } else { alert("Invalid Credentials"); }
+            };
+            
+            const handleCheckAttendance = async (e) => {
+                e.preventDefault();
+                const res = await api.get(`/attendance?roll_number=${checkRoll}`);
+                if(res) setCheckData(res);
+            }
+
+            if(view === 'login') return (
+                <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center justify-center relative">
+                     <button onClick={onBack} className="absolute top-6 left-6 text-slate-500 flex gap-2 font-bold hover:text-indigo-600 transition"><LogOut size={20}/> Back</button>
+                     
+                     <div className="w-full max-w-md space-y-8 fade-in">
+                        <div className="bg-white p-8 rounded-2xl shadow-xl">
+                            <h2 className="text-2xl font-bold text-center mb-6 text-slate-800">Student Login</h2>
+                            <form onSubmit={handleLogin} className="space-y-4">
+                                <input name="student_id" placeholder="Student ID (e.g. STU-CS101) or Roll No" required className="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white transition"/>
+                                <input type="password" name="password" placeholder="Password" required className="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 focus:bg-white transition"/>
+                                <button className="w-full bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 transition transform active:scale-95 shadow-lg shadow-indigo-200">Login</button>
+                            </form>
+                        </div>
+
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border">
+                             <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2"><Search size={20}/> Quick Attendance Check</h3>
+                             <form onSubmit={handleCheckAttendance} className="flex gap-2">
+                                <input value={checkRoll} onChange={e=>setCheckRoll(e.target.value)} placeholder="Roll Number" className="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-slate-200 outline-none"/>
+                                <button className="bg-slate-800 text-white px-6 rounded-lg font-bold hover:bg-slate-700 transition">Check</button>
+                             </form>
+                             {checkData && (
+                                 <div className="mt-6 fade-in">
+                                    <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl mb-4 border border-slate-100">
+                                        <div className="relative w-16 h-16 flex-none">
+                                            <svg className="w-full h-full" viewBox="0 0 36 36"><path className="text-gray-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" /><path className="text-green-500 progress-circle" strokeDasharray={`${checkData.stats.percentage}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" /></svg>
+                                            <div className="absolute inset-0 flex items-center justify-center font-bold text-xs">{checkData.stats.percentage}%</div>
+                                        </div>
+                                        <div><p className="font-bold text-slate-700">Attendance Score</p><p className="text-sm text-slate-500">{checkData.stats.present} / {checkData.stats.total} Days Present</p></div>
+                                    </div>
+                                    <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scroll">
+                                        {checkData.history.map(h => (
+                                            <div key={h.id} className="flex justify-between text-sm border-b pb-2 pt-1"><span>{h.date}</span><span className={h.status==='present' ? 'text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded' : 'text-red-500 bg-red-50 px-2 py-0.5 rounded'}>{h.status}</span></div>
+                                        ))}
+                                    </div>
+                                 </div>
+                             )}
+                        </div>
+                     </div>
+                </div>
+            );
+            return <StudentFeedbackDashboard user={user} onLogout={() => setView('login')} />;
+        };
+
+        const StudentFeedbackDashboard = ({user, onLogout}) => {
+            const [submitted, setSubmitted] = useState(false);
+            const [ratings, setRatings] = useState({
+                overall_rating: 0, session_content: 0, practical_applicability: 0, trainer_interaction: 0, feedback_text: ''
+            });
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                await api.post('/feedback', {
+                    ...ratings, student_id: user.student_id, roll_number: user.roll_number,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                setSubmitted(true);
+            };
+
+            if(submitted) return (
+                <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+                    <div className="bg-white p-12 rounded-2xl shadow-xl text-center max-w-lg fade-in">
+                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle size={40}/></div>
+                        <h2 className="text-3xl font-bold text-slate-800 mb-2">Feedback Received!</h2>
+                        <button onClick={onLogout} className="bg-slate-800 text-white px-8 py-3 rounded-xl font-bold mt-6 hover:bg-slate-700 transition">Logout</button>
+                    </div>
+                </div>
+            )
+
+            const StarRating = ({label, field}) => (
+                <div className="mb-6">
+                    <p className="font-medium text-slate-700 mb-2">{label}</p>
+                    <div className="flex gap-2">
+                        {[1,2,3,4,5].map(star => (
+                            <button type="button" key={star} onClick={() => setRatings({...ratings, [field]: star})} className="transition transform hover:scale-110 focus:outline-none">
+                                <Star size={32} className={star <= ratings[field] ? "fill-yellow-400 text-yellow-400" : "text-slate-200"} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-slate-50 p-6">
+                     <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
+                        <div className="bg-indigo-600 p-6 text-white flex justify-between items-center">
+                            <div><h2 className="text-xl font-bold">Daily Feedback</h2><p className="text-indigo-200 text-sm">{user.name}</p></div>
+                            <button onClick={onLogout} className="bg-white/10 p-2 rounded hover:bg-white/20 transition"><LogOut size={20}/></button>
+                        </div>
+                        <form onSubmit={handleSubmit} className="p-8">
+                            <StarRating label="Overall Session Rating" field="overall_rating" />
+                            <StarRating label="Session Content Quality" field="session_content" />
+                            <StarRating label="Practical Applicability" field="practical_applicability" />
+                            <StarRating label="Trainer Interaction" field="trainer_interaction" />
+                            <div className="mt-4">
+                                <label className="block font-medium text-slate-700 mb-2">Comments (Optional)</label>
+                                <textarea className="w-full border rounded-xl p-4 h-32 outline-none focus:ring-2 focus:ring-indigo-500 transition" 
+                                    placeholder="Any suggestions?" value={ratings.feedback_text} onChange={e => setRatings({...ratings, feedback_text: e.target.value})}></textarea>
+                            </div>
+                            <button className="w-full mt-8 bg-indigo-600 text-white p-4 rounded-xl font-bold hover:bg-indigo-700 text-lg shadow-lg shadow-indigo-200 transition transform active:scale-95">Submit Feedback</button>
+                        </form>
+                     </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [page, setPage] = useState('home'); 
+            const [staffUser, setStaffUser] = useState(null);
+
+            const handleStaffLogin = (user) => {
+                setStaffUser(user);
+                setPage('admin_dashboard');
+            }
+
+            return (
+                <div className="fade-in">
+                    {page === 'home' && <HomePage onNavigate={setPage} />}
+                    {page === 'staff_login' && <StaffLogin onLoginSuccess={handleStaffLogin} onBack={() => setPage('home')} />}
+                    {page === 'admin_dashboard' && <AdminDashboard user={staffUser} onBack={() => { setStaffUser(null); setPage('home'); }} />}
+                    {page === 'student' && <StudentPortal onBack={() => setPage('home')} />}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<React.StrictMode><App /></React.StrictMode>);
+    </script>
+</body>
+</html>
